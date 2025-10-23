@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Form
+from fastapi import FastAPI, Request, Form
 from fastapi.responses import RedirectResponse
 from twilio.twiml.messaging_response import MessagingResponse
 
@@ -13,9 +13,15 @@ def redirect_to_post():
     return RedirectResponse(url="/webhook")
 
 @app.post("/webhook")
-async def webhook(Body: str = Form(...), From: str = Form(...)):
+async def webhook(request: Request):
+    try:
+        # نحاول نقرأ الرسالة سواء JSON أو form
+        data = await request.form()
+    except Exception:
+        data = await request.json()
+
+    text = data.get("Body", "").strip()
     resp = MessagingResponse()
-    text = Body.strip()
 
     if text.startswith("/سعر مساهمة"):
         reply = "تمام، الشركة مساهمة السعر 25000 شامل كل مصاريف التأسيس (عقد + سجل + ضريبة + نشر + قيمة مضافة + توكين + غرفة + استعلامات). المدة 10–15 يوم في الهيئة + 15 للبطاقة الضريبية. المكتب الافتراضي مش داخل في السعر."
