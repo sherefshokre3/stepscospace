@@ -1,6 +1,8 @@
 from fastapi import FastAPI, Form
-from twilio.twiml.messaging_response import MessagingResponse
 from fastapi.responses import RedirectResponse
+from twilio.twiml.messaging_response import MessagingResponse
+
+app = FastAPI()
 
 @app.get("/")
 def root():
@@ -9,8 +11,6 @@ def root():
 @app.get("/webhook")
 def redirect_to_post():
     return RedirectResponse(url="/webhook")
-
-app = FastAPI()
 
 @app.post("/webhook")
 async def webhook(Body: str = Form(...), From: str = Form(...)):
